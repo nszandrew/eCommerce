@@ -32,7 +32,6 @@ public class User implements UserDetails, Serializable {
     private Long id;
     @Column(length = 50)
     private String login;
-    @Column(length = 25)
     private String password;
     @Column(unique = true, length = 11)
     private String cpf;

@@ -5,5 +5,6 @@ public enum ProductType {
     PANTS,
     SHORTS,
     TENNIS,
-    SLIPPER
+    SLIPPER,
+    JAQUET
 }

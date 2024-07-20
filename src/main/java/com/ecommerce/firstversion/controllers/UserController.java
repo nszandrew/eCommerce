@@ -1,10 +1,9 @@
 package com.ecommerce.firstversion.controllers;
 
-import com.ecommerce.firstversion.entity.user.dto.UserDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserDataUpdateDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserDetailsDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserLoginDTO;
+import com.ecommerce.firstversion.entity.user.User;
+import com.ecommerce.firstversion.entity.user.dto.*;
 import com.ecommerce.firstversion.infra.mediatype.MediaType;
+import com.ecommerce.firstversion.infra.security.TokenService;
 import com.ecommerce.firstversion.services.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -22,11 +21,13 @@ public class UserController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -35,9 +36,7 @@ public class UserController {
             consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
     @Transactional
     public ResponseEntity<UserDTO> register(@RequestBody @Valid UserDTO data) {
-        if(data.email() != null && !data.email().isEmpty()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        var user = userService.createUser(data);
+        userService.createUser(data);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -45,10 +44,9 @@ public class UserController {
             produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML },
             consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
     public ResponseEntity login(@RequestBody @Valid UserLoginDTO data) {
-        var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
-        var auth = authenticationManager.authenticate(emailPassword);
 
-        return ResponseEntity.ok().build();
+        var tokenResponse = userService.login(data);
+        return new ResponseEntity<>(tokenResponse ,HttpStatus.OK);
     }
 
     @PutMapping(value = "/update",
