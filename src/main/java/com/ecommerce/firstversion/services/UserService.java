@@ -5,6 +5,8 @@ import com.ecommerce.firstversion.entity.user.dto.UserDataUpdateDTO;
 import com.ecommerce.firstversion.exceptions.customized.UserNotFoundException;
 import com.ecommerce.firstversion.repositorys.UserRepository;
 import com.ecommerce.firstversion.entity.user.User;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,8 +24,10 @@ public class UserService {
 
     public UserDTO createUser(UserDTO data) {
         logger.info("Creating new user");
-        User infos = new User(data);
-        repository.save(infos);
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        User newUser = new User(data.login(), encryptedPassword , data.cpf(), data.email(), data.phone());
+        repository.save(newUser);
         return data;
     }
 
