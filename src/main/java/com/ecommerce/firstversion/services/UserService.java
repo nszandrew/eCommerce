@@ -1,12 +1,12 @@
 package com.ecommerce.firstversion.services;
 
-import com.ecommerce.firstversion.entity.user.User;
-import com.ecommerce.firstversion.entity.user.dto.UserAuthResponseDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserDataUpdateDTO;
-import com.ecommerce.firstversion.entity.user.dto.UserLoginDTO;
-import com.ecommerce.firstversion.infra.security.TokenService;
-import com.ecommerce.firstversion.repositorys.UserRepository;
+import com.ecommerce.firstversion.entities.user.User;
+import com.ecommerce.firstversion.entities.user.UserType;
+import com.ecommerce.firstversion.entities.user.dto.*;
+import com.ecommerce.firstversion.configuration.security.TokenService;
+import com.ecommerce.firstversion.repositories.UserRepository;
+import com.ecommerce.firstversion.utils.SecurityUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,14 +22,17 @@ public class UserService {
     private final Logger logger = Logger.getLogger(UserService.class.getName());
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final SecurityUtil securityUtil;
 
-    public UserService(UserRepository repository, AuthenticationManager authenticationManager, TokenService tokenService) {
+    @Autowired
+    public UserService(UserRepository repository, AuthenticationManager authenticationManager, TokenService tokenService, SecurityUtil securityUtil) {
         this.repository = repository;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.securityUtil = securityUtil;
     }
 
-    public UserDTO createUser(UserDTO data) {
+    public UserRegisterDTO createUser(UserRegisterDTO data) {
         logger.info("Creating new user");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
@@ -63,5 +66,16 @@ public class UserService {
     public void deleteUser(Long id) {
         logger.info("Deleting a user");
         repository.deleteById(id);
+    }
+
+
+    public void updateUserToAdmin(UserToAdminDTO data) {
+        logger.info("Updating buyer to admin");
+        User currentUserName = securityUtil.verifyAdminPermissions();
+        var user = repository.findById(data.id()).orElseThrow(() -> new RuntimeException("User not found"));
+        if(!(user.getUserType() == UserType.BUYER)){
+            throw new RuntimeException("User is not a Buyer!");
+        }
+        user.updateRole(data);
     }
 }

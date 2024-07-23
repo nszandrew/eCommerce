@@ -1,6 +1,6 @@
 package com.ecommerce.firstversion.services;
 
-import com.ecommerce.firstversion.repositorys.UserRepository;
+import com.ecommerce.firstversion.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

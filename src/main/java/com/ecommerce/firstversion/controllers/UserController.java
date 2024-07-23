@@ -1,16 +1,13 @@
 package com.ecommerce.firstversion.controllers;
 
-import com.ecommerce.firstversion.entity.user.User;
-import com.ecommerce.firstversion.entity.user.dto.*;
-import com.ecommerce.firstversion.infra.mediatype.MediaType;
-import com.ecommerce.firstversion.infra.security.TokenService;
+import com.ecommerce.firstversion.entities.user.dto.*;
+import com.ecommerce.firstversion.configuration.mediatype.MediaType;
 import com.ecommerce.firstversion.services.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -20,49 +17,53 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final TokenService tokenService;
 
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager, TokenService tokenService) {
+    @Autowired
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.tokenService = tokenService;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping(value = "/register",
-            produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML },
-            consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
+            consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     @Transactional
-    public ResponseEntity<UserDTO> register(@RequestBody @Valid UserDTO data) {
+    public ResponseEntity<UserRegisterDTO> register(@RequestBody @Valid UserRegisterDTO data) {
         userService.createUser(data);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/login",
-            produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML },
-            consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
+            consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     public ResponseEntity login(@RequestBody @Valid UserLoginDTO data) {
 
         var tokenResponse = userService.login(data);
-        return new ResponseEntity<>(tokenResponse ,HttpStatus.OK);
+        return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
     }
 
     @PutMapping(value = "/update",
-            produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML },
-            consumes = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
+            consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     @Transactional
     public ResponseEntity<UserDataUpdateDTO> update(@RequestBody @Valid UserDataUpdateDTO data) {
         userService.updateUser(data);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
-    @GetMapping(value ="/{id}",
-            produces = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML })
+    @GetMapping(value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     public ResponseEntity<Optional<UserDetailsDTO>> getAll(@PathVariable Long id) {
         var allUsers = userService.getAllUsers(id).map(UserDetailsDTO::new);
         return ResponseEntity.ok(allUsers);
+    }
+
+    @PutMapping("/user/admin")
+    @Transactional
+    public ResponseEntity<UserToAdminDTO> updateUserToAdmin(@RequestBody @Valid UserToAdminDTO data) {
+        userService.updateUserToAdmin(data);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

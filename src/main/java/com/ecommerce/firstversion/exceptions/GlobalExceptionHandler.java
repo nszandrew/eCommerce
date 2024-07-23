@@ -1,5 +1,6 @@
 package com.ecommerce.firstversion.exceptions;
 
+import com.ecommerce.firstversion.exceptions.customized.AcessDeniedException;
 import com.ecommerce.firstversion.exceptions.customized.UserNotFoundException;
 import com.ecommerce.firstversion.exceptions.customized.UserNullValueException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleuserNullValueException (UserNullValueException ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @ExceptionHandler(AcessDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleAcessDeniedException (AcessDeniedException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
