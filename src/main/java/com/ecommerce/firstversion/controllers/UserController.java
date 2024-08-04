@@ -3,6 +3,11 @@ package com.ecommerce.firstversion.controllers;
 import com.ecommerce.firstversion.entities.user.dto.*;
 import com.ecommerce.firstversion.services.interfaces.UserService;
 import com.ecommerce.firstversion.utils.mediatype.MediaType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/api")
+@Tag(name = "User", description = "Endpoints for Users")
 public class UserController {
 
     private final UserService userService;
@@ -28,6 +34,11 @@ public class UserController {
     @PostMapping(value = "/register",
             produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
             consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+    @Operation(summary = "Register a new user", description = "Register a new user", tags = {"User"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = UserRegisterDTO.class))),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)})
     @Transactional
     public ResponseEntity<UserRegisterDTO> register(@RequestBody @Valid UserRegisterDTO data) {
         userService.createUser(data);
@@ -37,6 +48,11 @@ public class UserController {
     @PostMapping(value = "/login",
             produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
             consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+    @Operation(summary = "User login", description = "User Login", tags = {"User"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = UserLoginDTO.class))),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)})
     public ResponseEntity login(@RequestBody @Valid UserLoginDTO data) {
 
         var tokenResponse = userService.login(data);
@@ -46,6 +62,12 @@ public class UserController {
     @PutMapping(value = "/update",
             produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
             consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+    @Operation(summary = "Update user info", description = "Update user info", tags = {"User"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = UserDataUpdateDTO.class))),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)})
     @Transactional
     public ResponseEntity<UserDataUpdateDTO> update(@RequestBody @Valid UserDataUpdateDTO data) {
         userService.updateUser(data);
@@ -55,19 +77,25 @@ public class UserController {
     @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
             consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+    @Operation(summary = "Search one user by id", description = "Search one user by id", tags = {"User"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = UserDetailsDTO.class))),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)})
     public ResponseEntity<Optional<UserDetailsDTO>> getAll(@PathVariable Long id) {
         var allUsers = userService.getAllUsers(id).map(UserDetailsDTO::new);
         return ResponseEntity.ok(allUsers);
     }
 
-    @PutMapping("/user/admin")
-    @Transactional
-    public ResponseEntity<UserToAdminDTO> updateUserToAdmin(@RequestBody @Valid UserToAdminDTO data) {
-        userService.updateUserToAdmin(data);
-        return new ResponseEntity<>(data, HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deleting a User", description = "Deleting a User", tags = {"User"}, responses = {
+            @ApiResponse(description = "Updated", responseCode = "200", content = @Content),
+            @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)})
     @Transactional
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteUser(id);

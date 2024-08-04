@@ -17,5 +17,4 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    void updateUserToAdmin(UserToAdminDTO data);
 }

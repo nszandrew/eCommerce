@@ -73,15 +73,5 @@ public class UserServiceImpl implements UserService {
         logger.info("Deleting a user");
         repository.deleteById(id);
     }
-
-    @Override
-    public void updateUserToAdmin(UserToAdminDTO data) {
-        logger.info("Updating buyer to admin");
-        User currentUserName = securityUtil.verifyAdminPermissions();
-        var user = repository.findById(data.id()).orElseThrow(() -> new RuntimeException("User not found"));
-        if(!(user.getUserType() == UserType.BUYER)){
-            throw new RuntimeException("User is not a Buyer!");
-        }
-        user.updateRole(data);
-    }
 }
+
