@@ -3,6 +3,7 @@ package com.ecommerce.firstversion.exceptions;
 import com.ecommerce.firstversion.exceptions.customized.AcessDeniedException;
 import com.ecommerce.firstversion.exceptions.customized.UserNotFoundException;
 import com.ecommerce.firstversion.exceptions.customized.UserNullValueException;
+import com.ecommerce.firstversion.exceptions.customized.WeakPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleAcessDeniedException (AcessDeniedException ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(WeakPasswordException.class)
+    public ResponseEntity<ExceptionResponse> handleWeakPasswordException (WeakPasswordException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

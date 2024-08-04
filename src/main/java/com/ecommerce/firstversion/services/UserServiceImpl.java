@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRegisterDTO createUser(UserRegisterDTO data) {
         logger.info("Creating new user");
+        securityUtil.verifyPassword(data.password());
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         User newUser = new User(data.login(), encryptedPassword , data.cpf(), data.email(), data.phone());
