@@ -1,8 +1,8 @@
 package com.ecommerce.firstversion.controllers;
 
 import com.ecommerce.firstversion.entities.user.dto.*;
-import com.ecommerce.firstversion.configuration.mediatype.MediaType;
-import com.ecommerce.firstversion.services.UserService;
+import com.ecommerce.firstversion.services.interfaces.UserService;
+import com.ecommerce.firstversion.utils.mediatype.MediaType;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}",
-            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
+            consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     public ResponseEntity<Optional<UserDetailsDTO>> getAll(@PathVariable Long id) {
         var allUsers = userService.getAllUsers(id).map(UserDetailsDTO::new);
         return ResponseEntity.ok(allUsers);

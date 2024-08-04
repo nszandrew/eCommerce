@@ -5,7 +5,8 @@ import com.ecommerce.firstversion.entities.user.UserType;
 import com.ecommerce.firstversion.entities.user.dto.*;
 import com.ecommerce.firstversion.configuration.security.TokenService;
 import com.ecommerce.firstversion.repositories.UserRepository;
-import com.ecommerce.firstversion.utils.SecurityUtil;
+import com.ecommerce.firstversion.services.interfaces.UserService;
+import com.ecommerce.firstversion.utils.securityutil.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,22 +17,23 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
-    private final Logger logger = Logger.getLogger(UserService.class.getName());
+    private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final SecurityUtil securityUtil;
 
     @Autowired
-    public UserService(UserRepository repository, AuthenticationManager authenticationManager, TokenService tokenService, SecurityUtil securityUtil) {
+    public UserServiceImpl(UserRepository repository, AuthenticationManager authenticationManager, TokenService tokenService, SecurityUtil securityUtil) {
         this.repository = repository;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.securityUtil = securityUtil;
     }
 
+    @Override
     public UserRegisterDTO createUser(UserRegisterDTO data) {
         logger.info("Creating new user");
 
@@ -41,6 +43,7 @@ public class UserService {
         return data;
     }
 
+    @Override
     public UserAuthResponseDTO login (UserLoginDTO data){
         logger.info("Logging user");
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
@@ -50,6 +53,7 @@ public class UserService {
         return new UserAuthResponseDTO(token);
     }
 
+    @Override
     public UserDataUpdateDTO updateUser(UserDataUpdateDTO data) {
         logger.info("Updating one user");
         var user = repository.getReferenceById(data.id());
@@ -58,17 +62,19 @@ public class UserService {
         return data;
     }
 
+    @Override
     public Optional<User> getAllUsers(Long id) {
         logger.info("Getting all users");
         return repository.findById(id);
     }
 
+    @Override
     public void deleteUser(Long id) {
         logger.info("Deleting a user");
         repository.deleteById(id);
     }
 
-
+    @Override
     public void updateUserToAdmin(UserToAdminDTO data) {
         logger.info("Updating buyer to admin");
         User currentUserName = securityUtil.verifyAdminPermissions();

@@ -1,4 +1,4 @@
-package com.ecommerce.firstversion.utils;
+package com.ecommerce.firstversion.utils.securityutil;
 
 import com.ecommerce.firstversion.entities.user.User;
 import com.ecommerce.firstversion.entities.user.UserType;
@@ -29,17 +29,5 @@ public class SecurityUtil {
         }
 
         return currentUser;
-    }
-
-    public boolean verifyAdminPermissionsBoolean() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User currentUser = repository.findByLogin(currentUsername);
-
-        if (!currentUser.getUserType().equals(UserType.ADMIN)) {
-            throw new AccessDeniedException("You do not have permission to perform this operation.");
-        }
-
-        return true;
     }
 }

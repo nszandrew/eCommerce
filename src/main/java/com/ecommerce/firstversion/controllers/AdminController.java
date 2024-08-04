@@ -1,7 +1,8 @@
 package com.ecommerce.firstversion.controllers;
 
 import com.ecommerce.firstversion.entities.user.dto.ProductRegisterDTO;
-import com.ecommerce.firstversion.services.AdminService;
+import com.ecommerce.firstversion.services.interfaces.AdminService;
+import com.ecommerce.firstversion.utils.mediatype.MediaType;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,8 @@ public class AdminController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
+                 consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     @Transactional
     public ResponseEntity<ProductRegisterDTO> postProduct(@RequestBody @Valid ProductRegisterDTO data) {
         service.addProduct(data);

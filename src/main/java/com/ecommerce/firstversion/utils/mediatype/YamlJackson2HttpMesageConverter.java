@@ -1,4 +1,4 @@
-package com.ecommerce.firstversion.configuration.mediatype;
+package com.ecommerce.firstversion.utils.mediatype;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;

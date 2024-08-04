@@ -1,6 +1,6 @@
 package com.ecommerce.firstversion.configuration.webcofig;
 
-import com.ecommerce.firstversion.configuration.mediatype.YamlJackson2HttpMesageConverter;
+import com.ecommerce.firstversion.utils.mediatype.YamlJackson2HttpMesageConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
